@@ -1,97 +1,258 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Portfolio</title>
+from abc import ABC, abstractmethod
+from datetime import datetime
+import json
+import hashlib
+import uuid
 
-<style>
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #0078D4, #6A5ACD);
-    color: white;
-    text-align: center;
-}
 
-.container {
-    padding: 50px 20px;
-}
+# =========================
+# MODELS
+# =========================
 
-h1 {
-    font-size: 3rem;
-}
+class User:
+    def __init__(self, username, password, role="user"):
+        self.id = str(uuid.uuid4())
+        self.username = username
+        self.password_hash = self._hash_password(password)
+        self.role = role
+        self.created_at = datetime.now()
 
-.card {
-    max-width: 800px;
-    margin: auto;
-    background: rgba(255,255,255,0.15);
-    padding: 25px;
-    border-radius: 15px;
-}
+    def _hash_password(self, password):
+        return hashlib.sha256(password.encode()).hexdigest()
 
-img {
-    width: 250px;
-    height: 250px;
-    border-radius: 15px;
-    margin: 20px 0;
-    object-fit: cover;
-}
+    def verify_password(self, password):
+        return self.password_hash == hashlib.sha256(
+            password.encode()
+        ).hexdigest()
 
-button {
-    padding: 12px 25px;
-    border: none;
-    border-radius: 8px;
-    background: #FFD700;
-    color: black;
-    cursor: pointer;
-    font-size: 1rem;
-}
 
-button:hover {
-    background: white;
-}
+class Record:
+    def __init__(self, title, value):
+        self.id = str(uuid.uuid4())
+        self.title = title
+        self.value = value
+        self.created_at = datetime.now()
 
-#message {
-    margin-top: 20px;
-    font-size: 1.2rem;
-    font-weight: bold;
-}
-</style>
-</head>
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "value": self.value,
+            "created_at": self.created_at.isoformat()
+        }
 
-<body>
 
-<div class="container">
+# =========================
+# REPOSITORY
+# =========================
 
-    <h1>🚀 Start My HTML Journey</h1>
+class Repository(ABC):
 
-    <div class="card">
+    @abstractmethod
+    def save(self, item):
+        pass
 
-        <h2>This Is My Portfolio</h2>
+    @abstractmethod
+    def get_all(self):
+        pass
 
-        <imgs://via.placeholder.com/250
+    @abstractmethod
+    def delete(self, item_id):
+        pass
 
-        <p>
-            Welcome to my portfolio website.
-            I am learning HTML, CSS, and JavaScript.
-            This website is part of my journey to become a better web developer.
-        </p>
 
-        <button onclick="startJourney()">Start My Journey</button>
+class RecordRepository(Repository):
 
-        <div id="message"></div>
+    def __init__(self):
+        self.records = []
 
-    </div>
+    def save(self, record):
+        self.records.append(record)
 
-</div>
+    def get_all(self):
+        return self.records
 
-<script>
-function startJourney() {
-    document.getElementById("message").innerHTML =
-    "✅ My HTML Journey Has Started!";
-}
-</script>
+    def delete(self, item_id):
+        self.records = [
+            r for r in self.records
+            if r.id != item_id
+        ]
 
-</body>
-</html>
+
+# =========================
+# AUDIT SYSTEM
+# =========================
+
+class AuditLogger:
+
+    @staticmethod
+    def log(action, username):
+        timestamp = datetime.now()
+
+        with open("audit.log", "a") as file:
+            file.write(
+                f"{timestamp} | "
+                f"{username} | "
+                f"{action}\n"
+            )
+
+
+# =========================
+# BUSINESS LOGIC
+# =========================
+
+class RecordService:
+
+    def __init__(self, repository):
+        self.repository = repository
+
+    def create_record(self, title, value):
+
+        if len(title) < 3:
+            raise ValueError(
+                "Title must be at least 3 characters"
+            )
+
+        if value < 0:
+            raise ValueError(
+                "Value cannot be negative"
+            )
+
+        record = Record(title, value)
+        self.repository.save(record)
+
+        return record
+
+    def calculate_statistics(self):
+
+        records = self.repository.get_all()
+
+        if not records:
+            return None
+
+        values = [r.value for r in records]
+
+        return {
+            "count": len(values),
+            "total": sum(values),
+            "average": sum(values) / len(values),
+            "max": max(values),
+            "min": min(values)
+        }
+
+
+# =========================
+# REPORT ENGINE
+# =========================
+
+class ReportGenerator:
+
+    def generate_json_report(self, records):
+
+        report = [
+            record.to_dict()
+            for record in records
+        ]
+
+        with open(
+            "report.json",
+            "w"
+        ) as file:
+            json.dump(
+                report,
+                file,
+                indent=4
+            )
+
+
+# =========================
+# APPLICATION
+# =========================
+
+class Application:
+
+    def __init__(self):
+
+        self.users = {}
+
+        self.repo = RecordRepository()
+
+        self.service = RecordService(
+            self.repo
+        )
+
+        self.report_generator = ReportGenerator()
+
+    def register(self,
+                 username,
+                 password,
+                 role="user"):
+
+        if username in self.users:
+            raise Exception(
+                "Username already exists"
+            )
+
+        user = User(
+            username,
+            password,
+            role
+        )
+
+        self.users[username] = user
+
+        AuditLogger.log(
+            "REGISTER",
+            username
+        )
+
+    def login(
+        self,
+        username,
+        password
+    ):
+
+        user = self.users.get(username)
+
+        if not user:
+            return None
+
+        if user.verify_password(password):
+
+            AuditLogger.log(
+                "LOGIN",
+                username
+            )
+
+            return user
+
+        return None
+
+    def add_record(
+        self,
+        user,
+        title,
+        value
+    ):
+
+        record = self.service.create_record(
+            title,
+            value
+        )
+
+        AuditLogger.log(
+            f"ADD_RECORD:{record.id}",
+            user.username
+        )
+
+        return record
+
+
+# =========================
+# MAIN
+# =========================
+
+if __name__ == "__main__":
+
+    app = Application()
+
