@@ -1,1 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Start My HTML Journey</title>
 
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #0078D4, #6A5ACD);
+    color: white;
+    text-align: center;
+}
+
+.container {
+    padding: 100px 20px;
+}
+
+h1 {
+    font-size: 3rem;
+}
+
+p {
+    font-size: 1.2rem;
+    margin: 20px 0;
+}
+
+button {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    background: #FFD700;
+    color: black;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+button:hover {
+    background: white;
+}
+
+#message {
+    margin-top: 20px;
+    font-size: 1.3rem;
+    font-weight: bold;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🚀 Start My HTML Journey</h1>
+
+    <p>
+        Welcome to my coding adventure. Today I begin learning
+        HTML and building amazing websites.
+    </p>
+
+    <button onclick="startJourney()">Start</button>
+
+    <div id="message"></div>
+</div>
+
+<script>
+function startJourney() {
+    document.getElementById("message").innerHTML =
+        "✅ My HTML Journey Has Started!";
+}
+</script>
+
+</body>
+</html>
