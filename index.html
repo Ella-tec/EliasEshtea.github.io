@@ -256,3 +256,40 @@ if __name__ == "__main__":
 
     app = Application()
 
+    app.register(
+        "admin",
+        "Password123",
+        "admin"
+    )
+
+    user = app.login(
+        "admin",
+        "Password123"
+    )
+
+    if user:
+
+        app.add_record(
+            user,
+            "Revenue",
+            10000
+        )
+
+        app.add_record(
+            user,
+            "Expenses",
+            4500
+        )
+
+        stats = app.service.calculate_statistics()
+
+        print("\nStatistics:")
+        print(stats)
+
+        app.report_generator.generate_json_report(
+            app.repo.get_all()
+        )
+
+        print(
+            "\nReport generated successfully."
+        )
