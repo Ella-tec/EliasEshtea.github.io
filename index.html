@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Start My HTML Journey</title>
+<title>My Portfolio</title>
 
 <style>
 body {
@@ -15,16 +15,27 @@ body {
 }
 
 .container {
-    padding: 100px 20px;
+    padding: 50px 20px;
 }
 
 h1 {
     font-size: 3rem;
 }
 
-p {
-    font-size: 1.2rem;
+.card {
+    max-width: 800px;
+    margin: auto;
+    background: rgba(255,255,255,0.15);
+    padding: 25px;
+    border-radius: 15px;
+}
+
+img {
+    width: 250px;
+    height: 250px;
+    border-radius: 15px;
     margin: 20px 0;
+    object-fit: cover;
 }
 
 button {
@@ -33,8 +44,8 @@ button {
     border-radius: 8px;
     background: #FFD700;
     color: black;
-    font-size: 1rem;
     cursor: pointer;
+    font-size: 1rem;
 }
 
 button:hover {
@@ -43,30 +54,42 @@ button:hover {
 
 #message {
     margin-top: 20px;
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     font-weight: bold;
 }
 </style>
 </head>
+
 <body>
 
 <div class="container">
+
     <h1>🚀 Start My HTML Journey</h1>
 
-    <p>
-        Welcome to my coding adventure. Today I begin learning
-        HTML and building amazing websites.
-    </p>
+    <div class="card">
 
-    <button onclick="startJourney()">Start</button>
+        <h2>This Is My Portfolio</h2>
 
-    <div id="message"></div>
+        <imgs://via.placeholder.com/250
+
+        <p>
+            Welcome to my portfolio website.
+            I am learning HTML, CSS, and JavaScript.
+            This website is part of my journey to become a better web developer.
+        </p>
+
+        <button onclick="startJourney()">Start My Journey</button>
+
+        <div id="message"></div>
+
+    </div>
+
 </div>
 
 <script>
 function startJourney() {
     document.getElementById("message").innerHTML =
-        "✅ My HTML Journey Has Started!";
+    "✅ My HTML Journey Has Started!";
 }
 </script>
 
